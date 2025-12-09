@@ -1,3 +1,4 @@
+
 <?php
 session_start();
 include "DLL.php";
@@ -11,7 +12,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     if (empty($email) || empty($senha)) {
         $mensagem_erro = "Preencha todos os campos.";
     } else {
-        // Busca usuário no banco
+        
         $stmt = $conn->prepare("SELECT id_usuario, nome, senha FROM usuarios WHERE email = ?");
         $stmt->bind_param("s", $email);
         $stmt->execute();
@@ -20,13 +21,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         if ($resultado->num_rows > 0) {
             $usuario = $resultado->fetch_assoc();
 
-            // Verifica senha
             if (password_verify($senha, $usuario["senha"])) {
 
-                // 🔹 Aqui as linhas que você pediu
                 $_SESSION["status"]       = "logado";
                 $_SESSION["nome_usuario"] = $usuario["nome"];
-                $_SESSION["id_usuario"]   = $usuario["id_usuario"]; // ESSENCIAL
+                $_SESSION["id_usuario"]   = $usuario["id_usuario"]; 
                 $_SESSION["usuario"]      = $usuario["nome"];
 
                 header("Location: principal.php");
@@ -68,4 +67,5 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <p><a href="cadastro.php">Cadastre-se aqui</a></p>
 </body>
 </html>
+
 
