@@ -55,25 +55,39 @@ if (!isset($_POST["cadastrar"])) {
     exit();
 }
 
-$nome = $_POST["nome_usuario"];
-$email = $_POST["email_usuario"];
-$telefone = $_POST["telefone_usuario"];
+$nome            = $_POST["nome_usuario"];
+$email           = $_POST["email_usuario"];
+$telefone        = $_POST["telefone_usuario"];
 $data_nascimento = $_POST["data_nascimento"];
-$senha = $_POST["senha_usuario"];
-$confirma_senha = $_POST["confirma_senha"];
+$senha           = $_POST["senha_usuario"];
+$confirma_senha  = $_POST["confirma_senha"];
+
+?>
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Cadastro - Blog Simples</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<main class="container">
+<?php
 
 if ($senha !== $confirma_senha) {
-    echo "<p> As senhas não conferem. <a href='cadastro.php'>Tente novamente</a></p>";
+    echo "<p>As senhas não conferem. <a href='cadastro.php'>Tente novamente</a></p>";
+    echo "</main></body></html>";
     exit();
 }
 
 $senha_criptografada = password_hash($senha, PASSWORD_DEFAULT);
 
 $sql_verifica = "SELECT * FROM usuarios WHERE email = '$email'";
-$resultado = mysqli_query($conn, $sql_verifica);
+$resultado    = mysqli_query($conn, $sql_verifica);
 
 if (mysqli_num_rows($resultado) > 0) {
-    echo "<p> O email <b>$email</b> já está cadastrado. <a href='cadastro.php'>Tente novamente</a></p>";
+    echo "<p>O email <b>$email</b> já está cadastrado. <a href='cadastro.php'>Tente novamente</a></p>";
+    echo "</main></body></html>";
     exit();
 }
 
@@ -85,4 +99,7 @@ if (mysqli_query($conn, $sql_inserir)) {
 } else {
     echo "<p>Erro ao cadastrar usuário: " . mysqli_error($conn) . "</p>";
 }
+
+echo "</main></body></html>";
 ?>
+
