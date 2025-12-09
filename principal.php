@@ -5,45 +5,74 @@ if (!isset($_SESSION["status"]) || $_SESSION["status"] !== "logado") {
     header("Location: index.php");
     exit();
 }
+
+include("DLL.php");
+
+$sql = "
+    SELECT p.conteudo, p.criado_em, u.nome
+    FROM publicacoes p
+    JOIN usuarios u ON p.id_usuario = u.id_usuario
+    ORDER BY p.criado_em DESC
+";
+
+$result = $conn->query($sql);
+if (!$result) {
+    die("Erro na consulta: (" . $conn->errno . ") " . $conn->error);
+}
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Página Principal</title>
+    <title>Feed</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
     <header>
         <h1>Bem-vindo ao Seu Blog</h1>
-        <h3>Olá, <?= htmlspecialchars($_SESSION["nome_usuario"]) ?>!</h3>
+        <h3>Olá, <?= htmlspecialchars($_SESSION["nome_usuario"] ?? "") ?>!</h3>
     </header>
 
     <nav>
         <ul>
-            <li><a href="#Novas Publicações">Novas Publicações</a></li>
-            <li><a href="perfil.php">Perfil de usuario</a></li>
-            <li><a href="#Fale conosco">Fale conosco</a></li>
+            <li><a href="principal.php">Feed</a></li>
+            <li><a href="publicar.php">Publicar</a></li>
+            <li><a href="Perfil.php">Perfil de usuário</a></li>
+            <li><a href="fale_conosco.php">Fale conosco</a></li>
             <li><a href="lougout.php">Sair</a></li>
         </ul>
     </nav>
 
     <main class="conteudo">
-        <h2>Faça uma nova publicação</h2>
-
-        <form action="publicar.php" method="post">
-            <textarea name="conteudo" rows="4" cols="60" placeholder="Escreva sua publicação..." required></textarea><br><br>
-            <button type="submit">Publicar</button>
-        </form>
+        <h2>Publicações recentes</h2>
 
         <?php
         if (isset($_SESSION["mensagem"])) {
             echo "<p>" . htmlspecialchars($_SESSION["mensagem"]) . "</p>";
             unset($_SESSION["mensagem"]);
         }
+
+        if ($result->num_rows > 0):
+            while ($row = $result->fetch_assoc()):
+        ?>
+                <article class="publicacao">
+                    <small>
+                        <strong><?= htmlspecialchars($row["nome"]) ?></strong>
+                        &bull;
+                        <?= htmlspecialchars($row["criado_em"]) ?>
+                    </small>
+                    <hr>
+                    <p><?= nl2br(htmlspecialchars($row["conteudo"])) ?></p>
+                </article>
+        <?php
+            endwhile;
+        else:
+            echo "<p>Não há publicações ainda.</p>";
+        endif;
         ?>
     </main>
+
     <section id="contato" style="text-align: center;">
         <h2>Contato</h2>
         <p>Email: nosso@blog.com</p>
@@ -56,4 +85,8 @@ if (!isset($_SESSION["status"]) || $_SESSION["status"] !== "logado") {
 
 </body>
 </html>
+
+
+
+
 
