@@ -8,7 +8,7 @@ if (!isset($_POST["cadastrar"])) {
     <html lang="pt-br">
     <head>
         <meta charset="UTF-8">
-        <title>Cadastro - Blog Simples</title>
+        <title>Cadastro</title>
         <link rel="stylesheet" href="css/style.css">
     </head>
     <body>
@@ -55,49 +55,45 @@ if (!isset($_POST["cadastrar"])) {
     exit();
 }
 
-$nome            = $_POST["nome_usuario"];
-$email           = $_POST["email_usuario"];
-$telefone        = $_POST["telefone_usuario"];
-$data_nascimento = $_POST["data_nascimento"];
-$senha           = $_POST["senha_usuario"];
-$confirma_senha  = $_POST["confirma_senha"];
-
+extract($_POST);
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Cadastro - Blog Simples</title>
+    <title>Cadastro</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 <main class="container">
 <?php
 
-if ($senha !== $confirma_senha) {
+if ($senha_usuario !== $confirma_senha) {
     echo "<p>As senhas não conferem. <a href='cadastro.php'>Tente novamente</a></p>";
     echo "</main></body></html>";
     exit();
 }
 
-$senha_criptografada = password_hash($senha, PASSWORD_DEFAULT);
+$sql_verifica = "SELECT * FROM usuarios WHERE email = '$email_usuario'";
+$resultado = banco($server, $user, $password, $db, $sql_verifica);
 
-$sql_verifica = "SELECT * FROM usuarios WHERE email = '$email'";
-$resultado    = mysqli_query($conn, $sql_verifica);
+$usuario_existente = $resultado->fetch_assoc();
 
-if (mysqli_num_rows($resultado) > 0) {
-    echo "<p>O email <b>$email</b> já está cadastrado. <a href='cadastro.php'>Tente novamente</a></p>";
+if ($usuario_existente) {
+    echo "<p>O email <b>$email_usuario</b> já está cadastrado. <a href='cadastro.php'>Tente novamente</a></p>";
     echo "</main></body></html>";
     exit();
 }
 
-$sql_inserir = "INSERT INTO usuarios (nome, email, telefone, data_nascimento, senha) 
-                VALUES ('$nome', '$email', '$telefone', '$data_nascimento', '$senha_criptografada')";
+$sql_inserir = "
+    INSERT INTO usuarios (nome, email, telefone, data_nascimento, senha)
+    VALUES ('$nome_usuario', '$email_usuario', '$telefone_usuario', '$data_nascimento', '$senha_usuario')
+";
 
-if (mysqli_query($conn, $sql_inserir)) {
-    echo "<p>Usuário <b>$nome</b> cadastrado com sucesso! <a href='index.php'>Fazer login</a></p>";
+if (banco($server, $user, $password, $db, $sql_inserir)) {
+    echo "<p>Usuário <b>$nome_usuario</b> cadastrado com sucesso! <a href='index.php'>Fazer login</a></p>";
 } else {
-    echo "<p>Erro ao cadastrar usuário: " . mysqli_error($conn) . "</p>";
+    echo "<p>Erro ao cadastrar usuário!</p>";
 }
 
 echo "</main></body></html>";
